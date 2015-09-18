@@ -27,7 +27,7 @@ iLaplace(fullOpt, ff, ff.gr, ff.hess,
 double, the logarithm of the integral
 }
 \description{
-This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package.
+This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package on \url{https://github.com/erlisR/iLaplaceExamples}.
 }
 \details{
 \code{iLaplace} approximates integrals of the form \deqn{I = \int_{x\in\mathcal{R}^d}\exp\{-h(x)\}\,dx}{I = \int\exp(-h(x)) dx} where \eqn{-h(\cdot)}{-h()} is a concave and unimodal function, with \eqn{x}{x} being \eqn{d}{d} dimensional real vector (\eqn{d>1}{d>1}). The approximation of \eqn{I} is obtained as the ratio between the unormalised kernel \eqn{-h(x)}{-h(x)} and an approximate density function \eqn{f(x)}{f(x)}, both evaluated at the modal value \eqn{x = \hat{x}}{x = \hat{x}}. The approximate density function \eqn{f(x)}{f(x)} is obtained by resorting to the Laplace approximation for marginal densities. The normalisation of the univariate components is done as follows. First, for each of the \eqn{d}{d} dimensions, a suitable grid is fixed in the neighbourhood of \eqn{\hat x}{\hat x}. To be sure all the region with non-negligible mass is considered, the extreemes of the neighbourhood are set to \eqn{(\hat x - \delta se,\hat x + \delta se)}{(\hat x - delta*se, \hat x - delta*se)} and the grid is made of \code{sp.points} equally spaced values. Here, \eqn{se}{se} is a suitable "profile" standard error that is computed from the Hessian matrix evaluated at the modal value. \code{delta} is fixed to 13 by default. Finally, the scalar Laplace approximations for marginal densities are evaluated over the grids and the densities are reconstrcuted via the \code{\link[stats]{splinefun}} function. Lastly the splines are then normalized with the function \code{\link[stats]{integrate}} over the region constructed as above.
@@ -37,7 +37,8 @@ This function computes the improved Laplace approximation of Ruli et al. (2015) 
 
 ## See the examples provided in the pacakge iLaplaceExamples, which is
 ## an auxiliary R pacakge for iLaplace. To download it run
-## devtools::install_github(erlisR/iLaplaceExamples).
+## devtools::install_github(erlisR/iLaplaceExamples) in R or go
+## to \\url{https://github.com/erlisR/iLaplaceExamples}.
 
 }
 }

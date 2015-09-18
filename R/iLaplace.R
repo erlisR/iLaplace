@@ -4,7 +4,7 @@
 ##'
 ##' @title Improved Laplace approximation (using analytical gradient and Hessian)
 ##'
-##' @description This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package.
+##' @description This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package on \url{https://github.com/erlisR/iLaplaceExamples}.
 ##' @usage iLaplace(fullOpt, ff, ff.gr, ff.hess,
 ##'          control = list(sp.points = 100, delta = 13, n.cores = detectCores()-1),
 ##'          clEvalQ = NULL, ...)
@@ -27,7 +27,8 @@
 ##'
 ##' ## See the examples provided in the pacakge iLaplaceExamples, which is
 ##' ## an auxiliary R pacakge for iLaplace. To download it run
-##' ## devtools::install_github(erlisR/iLaplaceExamples).
+##' ## devtools::install_github(erlisR/iLaplaceExamples) in R or go
+##' ## to \url{https://github.com/erlisR/iLaplaceExamples}.
 ##'
 ##' }
 ##'
