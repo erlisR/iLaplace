@@ -1,6 +1,7 @@
 ##' @name iLaplace
 ##' @import parallel
 ##' @useDynLib iLaplace
+##'
 ##' @title Improved Laplace approximation (using analytical gradient and Hessian)
 ##'
 ##' @description This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package.
