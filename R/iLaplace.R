@@ -1,6 +1,7 @@
 ##' @name iLaplace
 ##' @import parallel
 ##' @import Rcpp
+##' @import RcppArmadillo
 ##' @useDynLib iLaplace
 ##'
 ##' @title Improved Laplace approximation of d-variate concave and unimodal integrals

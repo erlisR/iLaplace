@@ -2,5 +2,6 @@
 
 export(iLaplace)
 import(Rcpp)
+import(RcppArmadillo)
 import(parallel)
 useDynLib(iLaplace)

@@ -9,7 +9,7 @@ Authors@R: c(
        person("Laura", "Ventura", role = "aut"))
 Description: Improved Laplace approximation of Ruli et al. (2015) for integrals of concave and unimodal functions. The function requires user-supply R functions for: the integrand, its gradient and its Hessian matrix. The computations are run in parallel.
 Depends: R (>= 3.2.2), stats
-Imports: parallel
+Imports: parallel, Rcpp, RcppArmadillo
 LinkingTo: Rcpp, RcppArmadillo
 Suggests: devtools
 License: GPL-2
