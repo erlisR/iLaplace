@@ -1,8 +1,9 @@
 ##' @name iLaplace
 ##' @import parallel
+##' @import Rcpp
 ##' @useDynLib iLaplace
 ##'
-##' @title Improved Laplace approximation (using analytical gradient and Hessian)
+##' @title Improved Laplace approximation of d-variate concave and unimodal integrals
 ##'
 ##' @description This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package on \url{https://github.com/erlisR/iLaplaceExamples}.
 ##' @usage iLaplace(fullOpt, ff, ff.gr, ff.hess,
@@ -47,15 +48,78 @@ iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
   par.val[control$sp.points + 1,] <- 1:m
   fullOpt$ldblock =  ldetHessBlocks(fullOpt$hessian, m)
 
-  objfun <- function(argv, ...){
-    lo = oo$lo
-    up = oo$up
-    xv <- argv[1:control$sp.points]
-    index <- argv[control$sp.points + 1]
-    ila.dens <- function(pp, index) {
-      marg = function(x) {
+  if (m < 3) {
+      log.ncost = log.den = 0.0
+      lo = oo$lo
+      up = oo$up
+      par.val <- par.val[-(control$sp.points + 1),]
+
+      marg = function(x1) {
         out <- tryCatch({
-          tmp = function(xx) ff(c(x, xx), ...)
+          tmp = function(x) ff(c(x1, x), ...)
+          gr.tmp = function(x) ff.gr(c(x1, x), ...)[-1]
+          hes.tmp = function(x) ff.hess(c(x1,x), ...)[-1,-1]
+          tmpOpt = nlminb(fullOpt$par[2], tmp, gradient = gr.tmp)
+          tmpOpt$hessian = hes.tmp(tmpOpt$par)
+          ans = -0.5*log(2*pi) + 0.5*(determinant(fullOpt$hessian)$mod - log(abs(tmpOpt$hessian))) - tmpOpt$obj + fullOpt$obj
+          exp(ans)
+        },
+          error = function(e) {
+            return(0.0)
+          },
+          warning = function(w) {
+            return(NULL)
+          },
+          finally = {
+
+          }
+        )
+        return(out)
+      }
+
+      fun.val <- sapply(par.val[,1], marg)
+      marg.sp <- splinefun(x = par.val[,1], y = fun.val)
+      nc.marg <- integrate(marg.sp, lower = lo[1], upper = up[1])$value
+
+      log.ncost <- log(nc.marg) + log.ncost
+      log.den <- log(marg(fullOpt$par[1])) + log.den
+
+      # the conditional
+      cond = function(x) {
+        out <- tryCatch({
+          tt = -ff(c(fullOpt$par[1], x), ...) + fullOpt$objective
+          exp(tt)
+        },
+          error = function(e) {
+            return(0.0)
+          },
+          warning = function(w) {
+            return(NULL)
+          },
+          finally = {
+          }
+        )
+        return(out)
+      }
+      lcfun.val <- sapply(par.val[,2], cond)
+      lcond.sp <- splinefun(x = par.val[,2], y = lcfun.val)
+      nc.cond <- integrate(lcond.sp, lower = lo[2], upper = up[2])$value
+
+      log.ncost <- log(nc.cond) + log.ncost
+      log.den <- log(cond(fullOpt$par[2])) + log.den
+
+      return(-fullOpt$obj - log.den + log.ncost)
+
+      } else {
+        objfun <- function(argv, ...){
+        lo = oo$lo
+        up = oo$up
+        xv <- argv[1:control$sp.points]
+        index <- argv[control$sp.points + 1]
+        ila.dens <- function(pp, index) {
+            marg = function(x) {
+            out <- tryCatch({
+              tmp = function(xx) ff(c(x, xx), ...)
           gr.tmp = function(xx) ff.gr(c(x, xx), ...)[-1]
           hess.tmp = function(xx) ff.hess(c(x, xx), ...)[-1, -1]
           optTmp = nlminb(start = fullOpt$par[-1], objective = tmp,
@@ -155,16 +219,15 @@ iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
     return(log.den - log(nc.cond))
   }
 
-  if (control$n.cores < 2) {
+        if (control$n.cores < 2) {
     message("#----------------------------------------\n cores < 2 -> computing the integral serially...\n#-----------------------------------------")
-    ilaf <- apply(X = par.val, MARGIN = 2, objfun, ... )
+    ilaf <- apply(X = par.val, MARGIN = 2, objfun, data)
 
   } else {
-
     cl <- makeCluster(control$n.cores, type = "SOCK")
-
     ipak <- function(pkg){
     new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+
     if (length(new.pkg))
       install.packages(new.pkg, dependencies = TRUE)
     sapply(pkg, require, character.only = TRUE)
@@ -181,12 +244,11 @@ iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
     };
       ipak(clEvalQ);})
 
-    ilaf <- parApply(cl = cl, X = par.val, MARGIN = 2, objfun, ... )
-
+    try(ilaf <- parApply(cl = cl, X = par.val, MARGIN = 2, objfun, ... ))
     stopCluster(cl = cl)
   }
-
   return(-fullOpt$obj - sum(ilaf))
+  }
 }
 
 # iLap_an2 <- function(fullOpt, ff, ff.gr, ff.hess,

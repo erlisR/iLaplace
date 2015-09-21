@@ -2,7 +2,7 @@
 % Please edit documentation in R/iLaplace.R
 \name{iLaplace}
 \alias{iLaplace}
-\title{Improved Laplace approximation (using analytical gradient and Hessian)}
+\title{Improved Laplace approximation of d-variate concave and unimodal integrals}
 \usage{
 iLaplace(fullOpt, ff, ff.gr, ff.hess,
          control = list(sp.points = 100, delta = 13, n.cores = detectCores()-1),
