@@ -233,13 +233,13 @@ iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
 
       clusterExport(cl = cl, ls(), envir = environment())
 
-      ilaf <- aaply(.data = par.val, .margins = 2,
+      suppressWarnings({ilaf <- aaply(.data = par.val, .margins = 2,
                     .fun = objfun, ..., .parallel = TRUE,
-                    .paropts = list(.packages = extraPackages))
+                    .paropts = list(.packages = extraPackages))})
       stopCluster(cl = cl)
 
     }
-    suppressWarnings(return(-fullOpt$obj - sum(ilaf)))
+    return(-fullOpt$obj - sum(ilaf))
   }
 }
 # iLap_an2 <- function(fullOpt, ff, ff.gr, ff.hess,
