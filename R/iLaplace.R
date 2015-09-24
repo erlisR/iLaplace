@@ -237,8 +237,9 @@ iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
                     .fun = objfun, ..., .parallel = TRUE,
                     .paropts = list(.packages = extraPackages))
       stopCluster(cl = cl)
+
     }
-    return(-fullOpt$obj - sum(ilaf))
+    return(suppressWarnings(-fullOpt$obj - sum(ilaf)))
   }
 }
 # iLap_an2 <- function(fullOpt, ff, ff.gr, ff.hess,
