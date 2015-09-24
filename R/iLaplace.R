@@ -239,7 +239,7 @@ iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
       stopCluster(cl = cl)
 
     }
-    return(suppressWarnings(-fullOpt$obj - sum(ilaf)))
+    suppressWarnings(return(-fullOpt$obj - sum(ilaf)))
   }
 }
 # iLap_an2 <- function(fullOpt, ff, ff.gr, ff.hess,
