@@ -6,7 +6,7 @@
 \usage{
 iLaplace(fullOpt, ff, ff.gr, ff.hess,
          control = list(sp.points = 100, delta = 13, n.cores = detectCores()-1),
-         clEvalQ = NULL, ...)
+         extraPackages = NULL, ...)
 }
 \arguments{
 \item{fullOpt}{A list containing the minium (to be accesed via \code{fullOpt$par}), the value of the function at the minimum (to be accessed via \code{fullOpt$objective}) and the Hessian matrix at the minimum (to be accessed via \code{fullOpt$hessian}}
@@ -19,7 +19,7 @@ iLaplace(fullOpt, ff, ff.gr, ff.hess,
 
 \item{control}{A named list of control parameters with elements \code{sp.points}, \code{delta} and \code{n.cores}. \code{sp.points} sets the number points for the spline evaluations; \code{delta} controls the length of the inteval of integration; \code{n.cores} sets the number of cores to be used for the parallel computiations. This is available for Linux/Unix systems only as it uses forking. See Details for more information.}
 
-\item{clEvalQ}{Other useful R packages to be passed to the (internally crated) clusters for the parallel computations. If required, provide package names as a vector of strings.}
+\item{extraPackages}{Other useful R packages to be passed to the (internally crated) clusters for the parallel computations. If required, provide package names as a vector of strings.}
 
 \item{...}{Additional arguments to be passed to \code{ff}, \code{ff.gr} and \code{ff.hess}}
 }

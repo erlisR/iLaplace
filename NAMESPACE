@@ -3,5 +3,7 @@
 export(iLaplace)
 import(Rcpp)
 import(RcppArmadillo)
+import(doParallel)
 import(parallel)
+importFrom(plyr,aaply)
 useDynLib(iLaplace)
