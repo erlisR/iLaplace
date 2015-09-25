@@ -2,13 +2,13 @@
 ##' @importFrom plyr aaply
 ##' @import parallel
 ##' @import doParallel
-##' @import Rcpp
+##' @importFrom Rcpp evalCpp
 ##' @import RcppArmadillo
 ##' @useDynLib iLaplace
 ##'
-##' @title Improved Laplace approximation of d-variate concave and unimodal integrals
+##' @title Improved Laplace approximation for integrals of unimodal functions
 ##'
-##' @description This function computes the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written functions. See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package on \url{https://github.com/erlisR/iLaplaceExamples}.
+##' @description This package implements the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written unimodal functions. Like the standard Laplace approximation, the improved Laplace approximation is deterministic as it replaces stochatsic integrations by numerical optimisations. However, whith respect to the Laplace approximation it involves \eqn{d}{d} (the dimensionality of the integral) scalar numerical integrations but it is more accurate, especially in those cases in which the integrand is skewed or has fat "tails". See Details below for more information. For practical examples on the use of this package please refer to the \code{iLaplaceExamples} package on \url{https://github.com/erlisR/iLaplaceExamples}.
 ##' @usage iLaplace(fullOpt, ff, ff.gr, ff.hess,
 ##'          control = list(sp.points = 100, delta = 13, n.cores = detectCores()-1),
 ##'          extraPackages = NULL, ...)
@@ -30,9 +30,10 @@
 ##'\dontrun{
 ##'
 ##' ## See the examples provided in the pacakge iLaplaceExamples, which is
-##' ## an auxiliary R pacakge for iLaplace. To download it run
-##' ## devtools::install_github(erlisR/iLaplaceExamples) in R or go
-##' ## to \url{https://github.com/erlisR/iLaplaceExamples}.
+##' ## an auxiliary R pacakge for iLaplace. To download it (be sure you have
+##' ## the devtools package) run from R
+##' ## devtools::install_github(erlisR/iLaplaceExamples)
+##' ## or download the source at \url{https://github.com/erlisR/iLaplaceExamples}.
 ##'
 ##' }
 ##'
