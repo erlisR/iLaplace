@@ -3,7 +3,6 @@
 ##' @import parallel
 ##' @import doParallel
 ##' @importFrom Rcpp evalCpp
-##' @import RcppArmadillo
 ##' @useDynLib iLaplace
 ##'
 ##' @title Improved Laplace approximation for integrals of unimodal functions
