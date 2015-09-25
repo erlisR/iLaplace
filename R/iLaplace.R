@@ -39,7 +39,6 @@
 ##'
 ##'
 ##' @export
-# iLaplace approximation for d-variate integral, with user-supplied objective function
 iLaplace <- function(fullOpt, ff, ff.gr, ff.hess,
                          control = list(sp.points = 100, delta = 13, n.cores = detectCores() - 1),
                          extraPackages = NULL, ...)
