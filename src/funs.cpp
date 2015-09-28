@@ -32,10 +32,12 @@ arma::vec seq_C(double a, double cent, double b, int lengthOut) {
 List seqMat(arma::vec par, arma::vec se, int lengthOut, int q, double delta){
   arma::vec av = par - delta*se;
   arma::vec bv = par + delta*se;
-  arma::mat out(lengthOut, q, arma::fill::zeros);
+  arma::mat out(lengthOut+1, q, arma::fill::zeros);
   for(int i=0; i<q; i++){
-    out.col(i) = seq_C(av(i), par(i), bv(i), lengthOut);
+    out(arma::span(0,lengthOut-1),i) = seq_C(av(i), par(i), bv(i), lengthOut);
+    out(lengthOut,i) = i+1;
   }
+
   return List::create(Named("parVal") = out,
                       Named("lo") = av,
                       Named("up") = bv);
