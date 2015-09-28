@@ -1,6 +1,6 @@
 Package: iLaplace
 Type: Package
-Title: Improved Laplace Approximation for Unimodal Functions
+Title: Improved Laplace Approximation for Integrals of Unimodal Functions
 Version: 1.0.0
 Date: 2015-09-01
 Authors@R: c(
