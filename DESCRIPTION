@@ -1,14 +1,17 @@
 Package: iLaplace
 Type: Package
-Title: Improved Laplace Approximation for Integrals of Unimodal Functions
-Version: 1.0.0
-Date: 2015-09-01
+Title: Improved Laplace Approximation for Integrals of Unimodal
+        Functions
+Version: 1.1.0
+Date: 2015-12-31
 Authors@R: c(
        person("Erlis", "Ruli", email = "erlisr@yahoo.it", role = c("aut", "cre")),
        person("Nicola", "Sartori", role = "aut"),
        person("Laura", "Ventura", role = "aut"))
-Description: Improved Laplace approximation for integrals of unimodal functions. The method requires user-supplied R functions for: the integrand, its gradient and its Hessian matrix. The computations are run in parallel.
-Depends: R (>= 3.2.2)
+Description: Improved Laplace approximation for integrals of unimodal functions.
+    The method requires user-supplied R functions for: the integrand, its gradient
+    and its Hessian matrix. The computations are run in parallel.
+Depends: R (>= 3.0.1), fastGHQuad
 Imports: doParallel, foreach, iterators, Rcpp, stats
 LinkingTo: Rcpp, RcppArmadillo
 Suggests: devtools
@@ -18,3 +21,6 @@ BugReports: https://github.com/erlisR/iLaplace/issues
 Author: Erlis Ruli [aut, cre], Nicola Sartori [aut], Laura Ventura [aut]
 Maintainer: Erlis Ruli <erlisr@yahoo.it>
 LazyData: true
+RoxygenNote: 5.0.1
+NeedsCompilation: yes
+Packaged: 2016-08-18 12:50:00 UTC; erlisruli

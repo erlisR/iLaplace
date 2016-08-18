@@ -1,29 +1,34 @@
 ##' @name iLap
-##' @importFrom stats integrate nlminb splinefun
+##' @importFrom stats nlminb
 ##' @import doParallel
 ##' @import foreach
 ##' @import iterators
 ##' @import Rcpp
+##' @import fastGHQuad
 ##' @useDynLib iLaplace
 ##'
 ##' @title Improved Laplace approximation for integrals of unimodal functions
 ##'
 ##' @description This function implements the improved Laplace approximation of Ruli et al. (2015) for multivariate integrals of user-written unimodal functions. See "Details" below for more information.
-##' @usage iLap(fullOpt, ff, ff.gr, ff.hess,
-##'      control = list(sp.points = 100, delta = 15, n.cores = 1), ...)
+##' @usage iLap(fullOpt, ff, ff.gr, ff.hess, quad.data, ...)
 ##' @param fullOpt A list containing the minium (to be accesed via \code{fullOpt$par}), the value of the function at the minimum (to be accessed via \code{fullOpt$objective}) and the Hessian matrix at the minimum (to be accessed via \code{fullOpt$hessian}
-##' @param ff The minus logarithm of the integrand function (the \code{h} function, see Details).
-##' @param ff.gr The gradient of \code{ff}, having the exact same arguments as  \code{ff}
-##' @param ff.hess The Hessian matrix of\code{ff}, having the exact same arguments as  \code{ff}
-##' @param control A named list of control parameters with elements \code{sp.points}, \code{delta} and \code{n.cores}. \code{sp.points} sets the number points for the spline evaluations; \code{delta} controls the length of the inteval of integration; \code{n.cores} sets the number of cores to be used for the parallel computiations. See Details for more information.
+##' @param ff The minus logarithm of the integrand function (the \code{h} function; see "Details").
+##' @param ff.gr The gradient of \code{ff}, having the exact same arguments as  \code{ff}.
+##' @param ff.hess The Hessian matrix of\code{ff}, having the exact same arguments as  \code{ff}.
+##' @param quad.data Data for the Gaussian-Herimte quadratures; see "Details"
 ##' @param ... Additional arguments to be passed to \code{ff}, \code{ff.gr} and \code{ff.hess}
 ##' @return A double, the logarithm of the integral
-##' @details \code{iLap} approximates integrals of the form \deqn{I = \int_{x\in\mathcal{R}^d}\exp\{-h(x)\}\,dx}{I = \int\exp(-h(x)) dx} where \eqn{-h(\cdot)}{-h()} is a concave and unimodal function, with \eqn{x}{x} being \eqn{d}{d} dimensional real vector (\eqn{d>1}{d>1}). The approximation of \eqn{I} is obtained as the ratio between the unormalised kernel \eqn{-h(x)}{-h(x)} and an approximate density function \eqn{f(x)}{f(x)}, both evaluated at the modal value \eqn{x = \hat{x}}{x = \hat{x}}. The approximate density function \eqn{f(x)}{f(x)} is obtained by resorting to the Laplace approximation for marginal densities. The minimisations are performed with \code{\link[stats]{nlminb}} by suppling the gradient \code{ff.gr} and Hessian matrix {ff.hess}. The normalisation of the univariate components is done as follows. First, for each of the \eqn{d}{d} dimensions, a suitable grid is fixed in the neighbourhood of \eqn{\hat x}{\hat x}. To be sure all the region with non-negligible mass is considered, the extreemes of the neighbourhood are set to \eqn{(\hat x - \delta se,\hat x + \delta se)}{(\hat x - delta*se, \hat x - delta*se)} and the grid is made of \code{sp.points} equally spaced values. Here, \eqn{se}{se} is a suitable "profile" standard error that is computed from the Hessian matrix evaluated at the modal value. \code{delta} is fixed to 13 by default. Finally, the scalar Laplace approximations for marginal densities are evaluated over the grids and the densities are reconstrcuted via the \code{\link[stats]{splinefun}} function. Lastly the splines are then normalized with the function \code{\link[stats]{integrate}} over the region constructed as above.
+##'
+##' @details \code{iLap} approximates integrals of the type \deqn{I = \int_{x\in\mathcal{R}^d}\exp\{-h(x)\}\,dx}{I = \int\exp(-h(x)) dx} where \eqn{-h(\cdot)}{-h()} is a concave and unimodal function, with \eqn{x}{x} being \eqn{d}{d} dimensional real vector (\eqn{d>1}{d>1}). The approximation of \eqn{I} is obtained as the ratio between the unormalised kernel \eqn{-h(x)}{-h(x)} and an approximate density function \eqn{f(x)}{f(x)}, both evaluated at the modal value \eqn{x = \hat{x}}{x = \hat{x}}. The approximate density function \eqn{f(x)}{f(x)} is obtained by resorting to the Laplace approximation for marginal densities. The minimisations are performed with \code{\link[stats]{nlminb}} by suppling the gradient \code{ff.gr} and Hessian matrix {ff.hess} of \eqn{f(x)}{f(x)}. The normalisation of the univariate components is perforemd via Gaussian-Hermite quadratures as implemented in the function \code{\link[fastGHQuad]{aghQuad}}. The Gaussian-Quadrature data, to be provided via the argument \code{quad.data}, can be computed with the function \code{\link[fastGHQuad]{gaussHermiteData}} for a desired number of quadrature points. See "Examples" below.
+##'
 ##'
 ##' @references
 ##' Ruli E., Sartori N. & Ventura L. (2015)
 ##' Improved Laplace approximation for marignal likelihoods.
 ##' \url{http://arxiv.org/abs/1502.06440}
+##'
+##' Liu, Q. and Pierce, D. A. (1994). A Note on Gauss-Hermite
+##' Quadrature. \emph{Biometrika} \bold{81}, 624-629.
 ##' @examples
 ##'
 ##' # The negative integrand function in log
@@ -64,8 +69,8 @@
 ##' normConts <- sapply(dims, function(mydim) {
 ##' opt <- nlminb(rep(1,mydim), ff, gradient = ff.gr, hessian = ff.hess, df = df)
 ##' opt$hessian <- ff.hess(opt$par, df = df);
-##' iLap <- iLap(opt, ff = ff, ff.gr = ff.gr, ff.hess = ff.hess,
-##' control = list(n.cores = 1), df = df);
+##' quad.data = gaussHermiteData(50)
+##' iLap <- iLap(opt, ff, ff.gr, ff.hess, quad.data = quad.data, df = df);
 ##' Lap <- mydim*log(2*pi)/2 - opt$objective - 0.5*determinant(opt$hessian)$mod;
 ##' return(c(iLap = iLap, Lap = Lap))
 ##' })
@@ -89,41 +94,30 @@
 ##'
 ##'
 ##' @export
-iLap <- function(fullOpt, ff, ff.gr, ff.hess,
-                         control = list(sp.points = 100, delta = 15, n.cores = 1),
-                         ...)
+iLap <- function(fullOpt, ff, ff.gr, ff.hess, quad.data, ...)
 {
-  if(is.null(control$sp.points)) control$sp.points <- 100
-  if(is.null(control$delta)) control$delta <- 15
-  if(is.null(control$n.cores)) control$n.cores <- 1
   i = NULL
 
   m = length(fullOpt$par)
-  se = SEv(fullOpt$hessian, m)
-  oo = seqMat(par = fullOpt$par, se, lengthOut = control$sp.points,
-              q = m, delta = control$delta)
-  par.val <- oo$parVal
-  up = oo$up
-  lo = oo$lo
-  fullOpt$ldblock =  ldetHessBlocks(fullOpt$hessian, m)
+  obj = aux_quant(fullOpt$hessian, m)
+  se = obj[[1]]
+  # se = SEv(fullOpt$hessian, m)
 
-  if (control$n.cores < 2) {
-    message("#----------------------------------------\n cores < 2 -> computing the integral serially...\n#-----------------------------------------")
-    ilaf <- sum(apply(X = par.val, MARGIN = 2, FUN = objfun,
-                  fullOpt = fullOpt, ff = ff, ff.gr = ff.gr,
-                  ff.hess = ff.hess, m = m, lo = lo, up = up,
-                  control = control, ...))
-    } else {
+  # fullOpt$ldblock =  ldetHessBlocks(fullOpt$hessian, m)
+  fullOpt$ldblock =  obj[[m+1]]
+  tmp = sapply(1:m, function(i) log(aghQuad(g = ila.densv,
+                                            muHat = fullOpt$par[i],
+                                            sigmaHat = se[i],
+                                            rule =  quad.data,
+                                            fullOpt = fullOpt,
+                                            ff = ff,
+                                            ff.gr = ff.gr,
+                                            ff.hess = ff.hess,
+                                            index = i,
+                                            m = m, ...)))
+  norm.const = sum(tmp)
 
-      # cl <- makeCluster(control$n.cores)
-      registerDoParallel(cores = control$n.cores)
-      itx <- iter(par.val, by = "column")
+  out = -m*0.5*log(2*pi) + 0.5*fullOpt$ldblock[1]
 
-      ilaf <- foreach(i = itx, .combine = sum) %dopar% {
-        objfun(i, fullOpt = fullOpt, ff = ff, ff.gr = ff.gr,
-               ff.hess = ff.hess, m = m, lo = lo, up = up,
-               control = control, ...)
-      }
-    }
-  return(-fullOpt$obj - ilaf)
+  return(-fullOpt$objective - out + norm.const)
 }
